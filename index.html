@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arena360 AI - World Cup 2026 Smart Stadium Platform</title>
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js CDN for live dashboard telemetry -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- Header & Universal Brand Navigation -->
+    <header>
+        <div class="header-container">
+            <div class="branding">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="url(#logoGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 6px rgba(99,102,241,0.6));">
+                    <defs>
+                        <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#6366f1" />
+                            <stop offset="100%" stop-color="#a855f7" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    <path d="M2 12h20"/>
+                </svg>
+                <span class="logo-text">Arena360 AI</span>
+                <span class="logo-tag">FIFA WC 26</span>
+            </div>
+
+            <!-- Dashboard View Mode Switcher Toggle -->
+            <div class="mode-switch-group">
+                <button id="btn-view-command" class="btn-toggle active">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    Venue Command Center
+                </button>
+                <button id="btn-view-fan" class="btn-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg>
+                    Fan Companion App
+                </button>
+            </div>
+
+            <!-- Top live metrics telemetry indicators -->
+            <div class="live-status-widgets">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="status-pulse"></span>
+                    <span style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">LIVE TELEMETRY</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main>
+
+        <!-- ===================================================================
+             VIEW 1: VENUE COMMAND CENTER (DESKTOP OPERATIONS CONTROL)
+             =================================================================== -->
+        <div id="panel-command" class="view-panel active-view">
+            <div class="command-dashboard">
+                
+                <!-- Left Main Section: Metrics, Charts, Incident Logs -->
+                <div class="dashboard-left-col">
+                    
+                    <!-- Metrics Summary Row -->
+                    <div class="telemetry-summary-row">
+                        <div class="glass-card telemetry-card">
+                            <div class="telemetry-icon-box">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            </div>
+                            <div class="telemetry-info">
+                                <span id="stat-total-occupancy" class="telemetry-num">0</span>
+                                <span class="telemetry-label">Active Attendees (<span id="stat-occupancy-percent">0%</span>)</span>
+                            </div>
+                        </div>
+
+                        <div class="glass-card telemetry-card">
+                            <div class="telemetry-icon-box">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            </div>
+                            <div class="telemetry-info">
+                                <span id="stat-active-incidents" class="telemetry-num">0</span>
+                                <span class="telemetry-label">Active Incidents</span>
+                            </div>
+                        </div>
+
+                        <div class="glass-card telemetry-card">
+                            <div class="telemetry-icon-box">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="m5 17 2-3 3 2 4-5 3 3 2-2"/></svg>
+                            </div>
+                            <div class="telemetry-info">
+                                <span id="stat-congested-gates" class="telemetry-num">0</span>
+                                <span class="telemetry-label">Congested Gates</span>
+                            </div>
+                        </div>
+
+                        <div class="glass-card telemetry-card success-card">
+                            <div class="telemetry-icon-box">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            </div>
+                            <div class="telemetry-info">
+                                <span id="stat-energy-savings" class="telemetry-num">0 kW</span>
+                                <span class="telemetry-label">AI Energy Saved</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Telemetry Graphs and Analytics -->
+                    <div class="chart-grid">
+                        <div class="glass-card chart-card">
+                            <div class="card-header-bar">
+                                <div class="card-title">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 20h20"/><path d="m5 17 2-3 3 2 4-5 3 3 2-2"/></svg>
+                                    Gate Queue Load (mins wait)
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="gateQueueChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="glass-card chart-card">
+                            <div class="card-header-bar">
+                                <div class="card-title">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/></svg>
+                                    Sector Capacity Load (%)
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="sectorCapacityChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Incident Feed and GenAI Operations Dispatcher -->
+                    <div class="glass-card" style="padding: 1.25rem;">
+                        <div class="card-header-bar" style="margin-bottom: 1rem;">
+                            <div class="card-title">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                                GenAI Real-Time Incident Dispatch Hub
+                            </div>
+                        </div>
+                        <div class="incident-control-panel">
+                            
+                            <!-- Left: List of active incidents -->
+                            <div class="incident-feed-section">
+                                <div style="font-size: 0.75rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); margin-bottom:0.5rem; font-weight:700;">Live Alerts Feed</div>
+                                <div id="incident-list-container" class="incident-list">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- Right: Blueprint Resolution Panel -->
+                            <div class="ai-dispatch-section">
+                                <div style="font-size: 0.75rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); margin-bottom:0.5rem; font-weight:700;">GenAI Incident Resolver</div>
+                                
+                                <div id="ai-empty-blueprint" class="ai-empty-state">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M12 2v4"/><path d="M12 18v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="m16.24 16.24 2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="m16.24 7.76 2.83-2.83"/></svg>
+                                    <p style="font-weight: 600; font-size: 0.85rem; color:#fff;">Select an Active Incident Alert</p>
+                                    <p style="font-size:0.75rem; margin-top:4px;">GenAI will automatically generate a step-by-step resolution plan, coordinate dispatcher resources, and write announcers script blueprints.</p>
+                                </div>
+
+                                <div id="ai-active-blueprint" class="ai-blueprint-active" style="display: none;">
+                                    <div class="ai-blueprint-header">
+                                        <div class="ai-badge-row">
+                                            <span class="ai-badge-chip">GenAI CoT Resolution Blueprint</span>
+                                            <span id="bp-severity" class="ai-badge-chip">HIGH</span>
+                                            <span id="bp-id" style="font-size: 0.7rem; color: var(--text-muted); font-weight:700; margin-left:auto;">INC-9304</span>
+                                        </div>
+                                        <div id="bp-title" class="ai-blueprint-title">Incident Title</div>
+                                    </div>
+
+                                    <div>
+                                        <div class="section-subtitle">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                                            AI Chain of Thought Reasoning
+                                        </div>
+                                        <div id="bp-reasoning-log" class="reasoning-chain">
+                                            <!-- Code text -->
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="section-subtitle">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                            Auto-Dispatched Field Units
+                                        </div>
+                                        <div id="bp-dispatched-units" class="dispatch-units-row">
+                                            <!-- Chips -->
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="section-subtitle">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                                            Immediate Resolution Directives
+                                        </div>
+                                        <ul id="bp-actions-list" class="blueprint-actions-list">
+                                            <!-- items -->
+                                        </ul>
+                                    </div>
+
+                                    <div>
+                                        <div class="section-subtitle">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M21 9H3"/><path d="M21 15H3"/><path d="M12 3v18"/></svg>
+                                            GenAI Local PA Broadcast Script
+                                        </div>
+                                        <div id="bp-broadcast-text" class="broadcast-box">
+                                            <!-- announcement template -->
+                                        </div>
+                                    </div>
+
+                                    <div class="dispatch-controls">
+                                        <button id="btn-bp-dispatch" class="btn-dispatch">Approve Blueprint & Dispatch</button>
+                                        <button id="btn-bp-dismiss" class="btn-dismiss">Clear</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar: Interactive Map SVG, Sustainability Panel -->
+                <div class="dashboard-right-col">
+                    
+                    <!-- Hackathon Scope Card -->
+                    <div class="glass-card" style="border: 1px solid rgba(245, 158, 11, 0.25); box-shadow: 0 0 15px rgba(245, 158, 11, 0.05); padding: 1.25rem;">
+                        <div class="card-header-bar" style="margin-bottom: 0.75rem;">
+                            <div class="card-title" style="color: var(--accent); font-size: 1.05rem;">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="width: 20px; height: 20px;"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+                                Hackathon Scope Index
+                            </div>
+                        </div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.4;">
+                            100% compliance. Click the tabs above to explore these integrated GenAI models:
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.72rem;">
+                            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 0.4rem 0.6rem;">
+                                <strong style="color: #fff; display:block; margin-bottom:2px;">🗺️ Navigation</strong>
+                                AI-Rerouted Eco Egress directions.
+                            </div>
+                            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 0.4rem 0.6rem;">
+                                <strong style="color: #fff; display:block; margin-bottom:2px;">👥 Crowd Control</strong>
+                                Live gate sensors & crowd heatmaps.
+                            </div>
+                            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 0.4rem 0.6rem;">
+                                <strong style="color: #fff; display:block; margin-bottom:2px;">♿ Accessibility</strong>
+                                Gate B routing & staff coordination.
+                            </div>
+                            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 0.4rem 0.6rem;">
+                                <strong style="color: #fff; display:block; margin-bottom:2px;">🚌 Transit Link</strong>
+                                Real-time shuttle, rideshare & metro loads.
+                            </div>
+                            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 0.4rem 0.6rem;">
+                                <strong style="color: #fff; display:block; margin-bottom:2px;">🌱 Sustainability</strong>
+                                Dynamic HVAC setback & trash reroutes.
+                            </div>
+                            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 0.4rem 0.6rem;">
+                                <strong style="color: #fff; display:block; margin-bottom:2px;">💬 Multilingual</strong>
+                                5-language chatbot & translation staff.
+                            </div>
+                            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 0.4rem 0.6rem;">
+                                <strong style="color: #fff; display:block; margin-bottom:2px;">📊 Ops Intelligence</strong>
+                                Active occupancy analytics & queue logs.
+                            </div>
+                            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 0.4rem 0.6rem;">
+                                <strong style="color: #fff; display:block; margin-bottom:2px;">🧠 Decision Support</strong>
+                                CoT Incident Resolver & radio scripts.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Interactive Stadium Schematic Map (Dynamic SVG) -->
+                    <div class="glass-card" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <div class="card-header-bar" style="width: 100%;">
+                            <div class="card-title">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/></svg>
+                                Stadium Telemetry Schematic
+                            </div>
+                        </div>
+
+                        <!-- Vector Soccer Pitch & Stand Rings -->
+                        <div style="position: relative; width: 100%; height: 260px; max-width:320px; display:flex; align-items:center; justify-content:center;">
+                            <svg width="240" height="240" viewBox="0 0 200 200" style="filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.15));">
+                                <!-- Outer Boundary Ring -->
+                                <circle cx="100" cy="100" r="92" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
+                                
+                                <!-- Outer Stand Rings (North, East, South, West Paths) -->
+                                <!-- North Stand -->
+                                <path d="M 30,70 A 90,90 0 0,1 170,70 L 155,85 A 70,70 0 0,0 45,85 Z" fill="rgba(99, 102, 241, 0.25)" stroke="var(--primary)" stroke-width="1.5" />
+                                <text x="100" y="55" fill="var(--text-muted)" font-size="8" font-weight="700" text-anchor="middle" font-family="'Outfit'">NORTH STAND</text>
+                                
+                                <!-- South Stand -->
+                                <path d="M 30,130 A 90,90 0 0,0 170,130 L 155,115 A 70,70 0 0,1 45,115 Z" fill="rgba(249, 115, 22, 0.18)" stroke="var(--warning)" stroke-width="1.5" style="filter: drop-shadow(0 0 3px var(--warning-glow));" />
+                                <text x="100" y="152" fill="var(--text-muted)" font-size="8" font-weight="700" text-anchor="middle" font-family="'Outfit'">SOUTH STAND (DENSE)</text>
+
+                                <!-- East Stand -->
+                                <path d="M 170,70 A 90,90 0 0,1 170,130 L 155,115 A 70,70 0 0,0 155,85 Z" fill="rgba(99, 102, 241, 0.25)" stroke="var(--primary)" stroke-width="1.5" />
+                                <text x="175" y="103" fill="var(--text-muted)" font-size="8" font-weight="700" text-anchor="middle" font-family="'Outfit'" transform="rotate(90, 175, 103)">EAST STAND</text>
+
+                                <!-- West Stand -->
+                                <path d="M 30,70 A 90,90 0 0,0 30,130 L 45,115 A 70,70 0 0,1 45,85 Z" fill="rgba(99, 102, 241, 0.25)" stroke="var(--primary)" stroke-width="1.5" />
+                                <text x="25" y="103" fill="var(--text-muted)" font-size="8" font-weight="700" text-anchor="middle" font-family="'Outfit'" transform="rotate(-90, 25, 103)">WEST STAND</text>
+                                
+                                <!-- Central pitch -->
+                                <rect x="70" y="80" width="60" height="40" rx="4" fill="rgba(16,185,129,0.15)" stroke="var(--success)" stroke-width="1.5" />
+                                <circle cx="100" cy="100" r="10" fill="none" stroke="var(--success)" stroke-width="1.2" />
+                                <line x1="100" y1="80" x2="100" y2="120" stroke="var(--success)" stroke-width="1.2" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- AI Sustainability & Smart Energy Management Panel -->
+                    <div class="glass-card sustainability-card">
+                        <div class="card-header-bar">
+                            <div class="card-title">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                AI Sustainability Optimizer
+                            </div>
+                        </div>
+
+                        <div class="sustainability-meters-grid">
+                            <div class="sustain-meter-box">
+                                <div class="meter-heading">
+                                    <span>Solar Storage</span>
+                                    <span>100%</span>
+                                </div>
+                                <div class="meter-value-large">Battery Full</div>
+                                <div class="meter-progress-container">
+                                    <div id="sustain-energy-fill" class="meter-progress-fill"></div>
+                                </div>
+                            </div>
+                            <div class="sustain-meter-box">
+                                <div class="meter-heading">
+                                    <span>Waste Density</span>
+                                    <span id="sustain-waste-value">Nominal</span>
+                                </div>
+                                <div class="meter-value-large" style="color: var(--secondary);">Recycling</div>
+                                <div class="meter-progress-container">
+                                    <div id="sustain-waste-fill" class="meter-progress-fill"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); margin-bottom:0.5rem; font-weight:700;">Dynamic Recommendations</div>
+                            <div id="sustainability-recommendation-list" class="sustainability-rec-list">
+                                <!-- filled dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             VIEW 2: FAN & VOLUNTEER COMPANION (HIGH-FIDELITY MOBILE EMULATOR)
+             =================================================================== -->
+        <div id="panel-fan" class="view-panel">
+            <div class="companion-simulator-container">
+                
+                <!-- Phone Chassis Frame wrapper -->
+                <div class="mobile-device-frame">
+                    
+                    <!-- Phone status indicators -->
+                    <div class="phone-status-bar">
+                        <span>14:27</span>
+                        <div class="phone-icons">
+                            <!-- Signal Icon -->
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="18" width="3" height="4" rx="0.5"/><rect x="7" y="14" width="3" height="8" rx="0.5"/><rect x="12" y="10" width="3" height="12" rx="0.5"/><rect x="17" y="6" width="3" height="16" rx="0.5"/></svg>
+                            <!-- Wifi Icon -->
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h.01"/><path d="M8.5 16.5a5 5 0 0 1 7 0"/><path d="M5 13a10 10 0 0 1 14 0"/><path d="M1.5 9.5a15 15 0 0 1 21 0"/></svg>
+                            <!-- Battery Icon -->
+                            <svg width="14" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="16" height="14" rx="2"/><line x1="22" y1="10" x2="22" y2="14"/></svg>
+                        </div>
+                    </div>
+
+                    <!-- App UI Wrapper -->
+                    <div class="mobile-app-wrapper">
+                        
+                        <!-- App header bar -->
+                        <div class="mobile-app-header">
+                            <div class="mobile-header-branding">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/></svg>
+                                <span class="mobile-header-title">Arena360 Fan</span>
+                            </div>
+                            <div>
+                                <span class="badge" style="background: rgba(99,102,241,0.12); color:var(--primary); font-size:0.55rem; padding:0.15rem 0.35rem;">FIFA 2026</span>
+                            </div>
+                        </div>
+
+                        <!-- App Inner Screen (Viewport) -->
+                        <div class="mobile-screen-content">
+                            
+                            <!-- Subscreen 1: AI Concierge Chatbot -->
+                            <div id="screen-concierge" class="mobile-sub-screen active-sub">
+                                <div class="chat-window">
+                                    <div id="mobile-chat-messages" class="chat-message-area">
+                                        <!-- Bubbles append here -->
+                                    </div>
+                                    <div id="mobile-suggested-queries" class="chat-suggested-queries">
+                                        <button class="suggested-btn" data-query="Where is Gate C?">Gate C wait?</button>
+                                        <button class="suggested-btn" data-query="Is there a short food queue?">Short food lines?</button>
+                                        <button class="suggested-btn" data-query="Transit wait times">Metro / Bus time?</button>
+                                        <button class="suggested-btn" data-query="Bag size limits">Backpack rules?</button>
+                                    </div>
+                                    <div class="chat-input-bar">
+                                        <input type="text" id="mobile-chat-input" class="chat-input-field" placeholder="Ask in Spanish, French, English, Arabic..." autocomplete="off">
+                                        <button id="mobile-chat-send" class="btn-chat-send">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Subscreen 2: Stadium Concession & Gate Radar -->
+                            <div id="screen-radar" class="mobile-sub-screen">
+                                <div class="stadium-map-box">
+                                    <div class="stadium-ring-mockup">
+                                        <div class="stadium-field-mockup"></div>
+                                        <!-- Pulsing Heatmap gate overlays -->
+                                        <div class="map-radar-pulse green" style="top: 15%; left: 50%;"></div>  <!-- Gate A -->
+                                        <div class="map-radar-pulse orange" style="top: 50%; left: 15%;"></div> <!-- Gate D -->
+                                        <div class="map-radar-pulse red" style="top: 50%; left: 85%;"></div>    <!-- Gate C -->
+                                    </div>
+                                    <div style="position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.7); padding: 4px 8px; border-radius:4px; font-size:0.55rem; color:var(--text-muted);">
+                                        Dynamic Heatmap Pulsars Active
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; flex-direction:column; gap:0.5rem; overflow-y:auto; flex-grow:1; max-height:220px; padding-right:4px;">
+                                    <div style="font-size:0.7rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); margin-bottom:0.25rem;">Live Gates & Concourse queues</div>
+                                    <div id="companion-gates-list" style="display:flex; flex-direction:column; gap:0.4rem;"></div>
+                                    
+                                    <div style="font-size:0.7rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); margin:0.5rem 0 0.25rem 0;">Food, Merch & Stands</div>
+                                    <div id="companion-concessions-list" style="display:flex; flex-direction:column; gap:0.4rem;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Subscreen 3: Intelligent Wayfinder Routing -->
+                            <div id="screen-wayfinder" class="mobile-sub-screen">
+                                <div style="font-size:0.72rem; color:var(--text-muted); margin-bottom: 0.5rem;">Let GenAI optimize your egress flow based on realtime congestion.</div>
+                                
+                                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
+                                    <div class="mobile-form-group">
+                                        <label for="nav-stand-select">Starting Stand</label>
+                                        <select id="nav-stand-select" class="mobile-select">
+                                            <option value="south">South Stand</option>
+                                            <option value="north">North Stand</option>
+                                            <option value="east">East Stand</option>
+                                            <option value="west">West Stand</option>
+                                        </select>
+                                    </div>
+                                    <div class="mobile-form-group">
+                                        <label for="nav-transit-select">Target Transit</label>
+                                        <select id="nav-transit-select" class="mobile-select">
+                                            <option value="metro">Metro Station</option>
+                                            <option value="shuttle">Shuttle Bus lot</option>
+                                            <option value="rideshare">Rideshare Lot G</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <button id="btn-nav-calculate" class="btn-dispatch" style="padding: 0.5rem; font-size: 0.75rem; border-radius: 6px; margin-top:0.25rem;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/></svg>
+                                    Calculate Eco-Reroute
+                                </button>
+
+                                <div id="nav-results-container" class="route-results-box" style="margin-top:0.5rem; flex-grow:1; overflow-y:auto; font-size:0.75rem;">
+                                    <div style="text-align:center; padding: 2rem 0; color:var(--text-muted);">Select stand & transit to load dynamically optimized navigation directions.</div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Mobile navigation bar -->
+                        <div class="mobile-nav-bar">
+                            <button class="mobile-nav-btn active" data-tab="concierge">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                                Concierge
+                            </button>
+                            <button class="mobile-nav-btn" data-tab="radar">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M6.34 17.66l-1.41 1.41"/><path d="M19.07 4.93l-1.41 1.41"/></svg>
+                                Live Radar
+                            </button>
+                            <button class="mobile-nav-btn" data-tab="wayfinder">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/></svg>
+                                Wayfinder
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Overlay Alerts Container for Toast Popups -->
+    <div id="toast-alerts-holder" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>
