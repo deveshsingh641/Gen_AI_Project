@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert';
 import { GenAIEngine } from '../ai-engine.js';
+import { StadiumTelemetrySimulator } from '../mock-data.js';
 import { INCIDENT_TEMPLATES, STADIUM_SECTORS, INITIAL_GATES, INITIAL_CONCESSIONS } from '../mock-data.js';
 
 test('GenAIEngine Incident Analysis Tests', async (t) => {
@@ -117,7 +118,8 @@ test('GenAIEngine Live Gemini API Mock Test', async (t) => {
     const originalFetch = globalThis.fetch;
     // Mock fetch
     globalThis.fetch = async (url, options) => {
-        assert.ok(url.includes('mock-api-key'));
+        assert.ok(url.includes('generateContent'));
+        assert.strictEqual(options.headers['x-goog-api-key'], 'mock-api-key');
         return {
             ok: true,
             json: async () => ({
@@ -144,4 +146,34 @@ test('GenAIEngine Live Gemini API Mock Test', async (t) => {
     } finally {
         globalThis.fetch = originalFetch; // restore original
     }
+});
+
+test('StadiumTelemetrySimulator Tests', (t) => {
+    const simulator = new StadiumTelemetrySimulator();
+    let called = false;
+    let telemetryData = null;
+
+    const unsubscribe = simulator.subscribe((data) => {
+        called = true;
+        telemetryData = data;
+    });
+
+    assert.ok(called);
+    assert.ok(telemetryData);
+    assert.ok(telemetryData.gates.length > 0);
+
+    // Trigger telemetry update
+    simulator.updateTelemetry();
+    
+    // Trigger new incident
+    const newInc = simulator.triggerNewIncident();
+    assert.ok(newInc);
+    assert.ok(telemetryData.incidents.some(i => i.id === newInc.id));
+
+    // Resolve incident
+    simulator.resolveIncident(newInc.id);
+    const resolvedInc = telemetryData.incidents.find(i => i.id === newInc.id);
+    assert.strictEqual(resolvedInc.status, 'Resolved');
+
+    unsubscribe();
 });

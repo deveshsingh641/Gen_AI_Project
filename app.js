@@ -8,6 +8,20 @@ import { GenAIEngine } from './ai-engine.js';
 const simulator = new StadiumTelemetrySimulator();
 const aiEngine = new GenAIEngine();
 
+// Global HTML Escaping Utility for XSS Prevention
+function escapeHTML(str) {
+    if (str === null || str === undefined) return '';
+    return String(str).replace(/[&<>'"]/g, 
+        tag => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+        }[tag] || tag)
+    );
+}
+
 // Chart instances
 let gateChartInstance = null;
 let sectorChartInstance = null;
@@ -174,11 +188,11 @@ function updateGateRadarLists(data) {
                 <div class="mobile-info-card" style="border-left: 3px solid ${statusColor}">
                     <div class="mobile-info-left">
                         <div>
-                            <div class="mobile-info-title">${gate.name}</div>
-                            <div class="mobile-info-subtitle">${gate.securityOpen} Security Lanes Open</div>
+                            <div class="mobile-info-title">${escapeHTML(gate.name)}</div>
+                            <div class="mobile-info-subtitle">${escapeHTML(gate.securityOpen)} Security Lanes Open</div>
                         </div>
                     </div>
-                    <div class="mobile-info-val" style="color: ${statusColor}">${gate.queueTime}m wait</div>
+                    <div class="mobile-info-val" style="color: ${statusColor}">${escapeHTML(gate.queueTime)}m wait</div>
                 </div>
             `;
         }).join('');
@@ -196,11 +210,11 @@ function updateGateRadarLists(data) {
                 <div class="mobile-info-card" style="border-left: 3px solid ${statusColor}">
                     <div class="mobile-info-left">
                         <div>
-                            <div class="mobile-info-title">${c.name}</div>
-                            <div class="mobile-info-subtitle">Popular: ${c.popularItem}</div>
+                            <div class="mobile-info-title">${escapeHTML(c.name)}</div>
+                            <div class="mobile-info-subtitle">Popular: ${escapeHTML(c.popularItem)}</div>
                         </div>
                     </div>
-                    <div class="mobile-info-val" style="color: ${statusColor}">${c.queueTime}m line</div>
+                    <div class="mobile-info-val" style="color: ${statusColor}">${escapeHTML(c.queueTime)}m line</div>
                 </div>
             `;
         }).join('');
@@ -218,11 +232,11 @@ function updateGateRadarLists(data) {
                 <div class="mobile-info-card" style="border-left: 3px solid ${statusColor}">
                     <div class="mobile-info-left">
                         <div>
-                            <div class="mobile-info-title">${t.name}</div>
-                            <div class="mobile-info-subtitle">Freq: ${t.frequency} | Load: ${t.capacityLoad}</div>
+                            <div class="mobile-info-title">${escapeHTML(t.name)}</div>
+                            <div class="mobile-info-subtitle">Freq: ${escapeHTML(t.frequency)} | Load: ${escapeHTML(t.capacityLoad)}</div>
                         </div>
                     </div>
-                    <div class="mobile-info-val" style="color: ${statusColor}">${t.waitTime}m wait</div>
+                    <div class="mobile-info-val" style="color: ${statusColor}">${escapeHTML(t.waitTime)}m wait</div>
                 </div>
             `;
         }).join('');
@@ -380,8 +394,8 @@ function updateSustainabilityWidget(data) {
     if (container) {
         container.innerHTML = report.recommendations.map(rec => `
             <div class="sustain-rec-item">
-                <div class="sustain-rec-title">${rec.title}</div>
-                <div class="sustain-rec-desc">[${rec.zone}] ${rec.desc}</div>
+                <div class="sustain-rec-title">${escapeHTML(rec.title)}</div>
+                <div class="sustain-rec-desc">[${escapeHTML(rec.zone)}] ${escapeHTML(rec.desc)}</div>
             </div>
         `).join('');
     }
@@ -407,20 +421,20 @@ function updateIncidentFeedList(data) {
         else if (inc.severity === 'Medium') badgeClass = 'badge-medium';
 
         const isSelected = inc.id === activeIncidentId ? 'selected' : '';
-        const resolvedTag = inc.status === 'Resolved' ? `<span style="color: var(--success); font-weight:700;">✓ Resolved</span>` : inc.reportedBy;
+        const resolvedTag = inc.status === 'Resolved' ? `<span style="color: var(--success); font-weight:700;">✓ Resolved</span>` : escapeHTML(inc.reportedBy);
 
         return `
-            <div class="incident-item ${isSelected}" data-id="${inc.id}">
+            <div class="incident-item ${isSelected}" data-id="${escapeHTML(inc.id)}">
                 <div class="incident-meta">
-                    <span class="incident-id">${inc.id} • ${inc.timestamp}</span>
-                    <span class="badge ${badgeClass}">${inc.severity}</span>
+                    <span class="incident-id">${escapeHTML(inc.id)} • ${escapeHTML(inc.timestamp)}</span>
+                    <span class="badge ${badgeClass}">${escapeHTML(inc.severity)}</span>
                 </div>
-                <div class="incident-title">${inc.title}</div>
-                <div class="incident-desc">${inc.description}</div>
+                <div class="incident-title">${escapeHTML(inc.title)}</div>
+                <div class="incident-desc">${escapeHTML(inc.description)}</div>
                 <div class="incident-location-row">
                     <span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                        ${inc.location}
+                        ${escapeHTML(inc.location)}
                     </span>
                     <span>${resolvedTag}</span>
                 </div>
@@ -475,14 +489,14 @@ function renderIncidentBlueprint(blueprint, status) {
     }
 
     // Reasoning Chain
-    document.getElementById('bp-reasoning-log').innerHTML = blueprint.reasoningChain.join('<br>');
+    document.getElementById('bp-reasoning-log').innerHTML = blueprint.reasoningChain.map(escapeHTML).join('<br>');
 
     // Dispatched Units
     const unitsRow = document.getElementById('bp-dispatched-units');
     unitsRow.innerHTML = blueprint.dispatchedUnits.map(unit => `
         <span class="unit-chip">
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            ${unit}
+            ${escapeHTML(unit)}
         </span>
     `).join('');
 
@@ -491,7 +505,7 @@ function renderIncidentBlueprint(blueprint, status) {
     actionsList.innerHTML = blueprint.immediateActions.map((action, idx) => `
         <li class="blueprint-action-item">
             <span class="blueprint-action-num">${idx + 1}</span>
-            <span>${action}</span>
+            <span>${escapeHTML(action)}</span>
         </li>
     `).join('');
 
@@ -606,18 +620,7 @@ function initChatBot() {
         });
     }
 
-    function escapeHTML(str) {
-        if (!str) return '';
-        return str.replace(/[&<>'"]/g, 
-            tag => ({
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                "'": '&#39;',
-                '"': '&quot;'
-            }[tag] || tag)
-        );
-    }
+
 
     function appendUserMessage(text) {
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -744,8 +747,8 @@ function showToastAlert(incident) {
     toast.innerHTML = `
         <div style="flex-shrink:0;">${icon}</div>
         <div class="toast-body">
-            <div class="toast-title">${incident.severity} SEVERITY ALERT: ${incident.type}</div>
-            <div class="toast-desc">${incident.title} at ${incident.location}</div>
+            <div class="toast-title">${escapeHTML(incident.severity)} SEVERITY ALERT: ${escapeHTML(incident.type)}</div>
+            <div class="toast-desc">${escapeHTML(incident.title)} at ${escapeHTML(incident.location)}</div>
         </div>
     `;
 
@@ -782,8 +785,8 @@ function showGeneralNotification(title, message) {
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         </div>
         <div class="toast-body">
-            <div class="toast-title" style="color:var(--success);">${title}</div>
-            <div class="toast-desc">${message}</div>
+            <div class="toast-title" style="color:var(--success);">${escapeHTML(title)}</div>
+            <div class="toast-desc">${escapeHTML(message)}</div>
         </div>
     `;
 

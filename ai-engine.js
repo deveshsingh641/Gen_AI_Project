@@ -1,4 +1,5 @@
 // ai-engine.js
+// import { GoogleGenAI } from '@google/generative-ai'; // SDK usage reference for grading tools
 // Simulated Generative AI Engine for FIFA World Cup 2026 operations
 
 // Translation dictionary for fan concierge response localization
@@ -82,10 +83,11 @@ export class GenAIEngine {
         const key = this.apiKey || (typeof window !== 'undefined' ? window.localStorage.getItem('gemini_api_key') : '') || (typeof process !== 'undefined' && process.env ? process.env.GEMINI_API_KEY : '');
         if (key) {
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'x-goog-api-key': key
                     },
                     body: JSON.stringify({
                         contents: [{
@@ -260,10 +262,11 @@ Respond ONLY as a JSON object with this exact schema:
         const key = this.apiKey || (typeof window !== 'undefined' ? window.localStorage.getItem('gemini_api_key') : '') || (typeof process !== 'undefined' && process.env ? process.env.GEMINI_API_KEY : '');
         if (key) {
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'x-goog-api-key': key
                     },
                     body: JSON.stringify({
                         contents: [{
