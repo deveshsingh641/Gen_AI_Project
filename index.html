@@ -15,7 +15,7 @@
     <header>
         <div class="header-container">
             <div class="branding">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="url(#logoGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 6px rgba(99,102,241,0.6));">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="url(#logoGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 6px rgba(99,102,241,0.6));" role="img" aria-label="Arena360 AI Logo">
                     <defs>
                         <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                             <stop offset="0%" stop-color="#6366f1" />
@@ -32,14 +32,29 @@
 
             <!-- Dashboard View Mode Switcher Toggle -->
             <div class="mode-switch-group">
-                <button id="btn-view-command" class="btn-toggle active">
+                <button id="btn-view-command" class="btn-toggle active" aria-pressed="true">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
                     Venue Command Center
                 </button>
-                <button id="btn-view-fan" class="btn-toggle">
+                <button id="btn-view-fan" class="btn-toggle" aria-pressed="false">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg>
                     Fan Companion App
                 </button>
+            </div>
+
+            <!-- Gemini API Settings -->
+            <div class="api-settings-container">
+                <button id="btn-toggle-settings" class="btn-settings-toggle" aria-label="Toggle AI Settings" title="Gemini API Key Settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+                <div id="api-settings-dropdown" class="api-settings-dropdown" style="display: none;">
+                    <label for="gemini-api-key-input" style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Gemini 1.5 Flash API Key:</label>
+                    <div style="display: flex; gap: 4px;">
+                        <input type="password" id="gemini-api-key-input" class="api-key-input" placeholder="AIzaSy..." aria-label="Gemini API Key input">
+                        <button id="btn-save-api-key" class="btn-save-key">Save</button>
+                    </div>
+                    <div style="font-size: 0.6rem; color: var(--success); margin-top: 4px; display: none;" id="api-key-success-msg">Key saved! Live AI Active.</div>
+                </div>
             </div>
 
             <!-- Top live metrics telemetry indicators -->
@@ -117,7 +132,7 @@
                                 </div>
                             </div>
                             <div class="chart-container">
-                                <canvas id="gateQueueChart"></canvas>
+                                <canvas id="gateQueueChart" role="img" aria-label="Gate Queue wait times bar chart"></canvas>
                             </div>
                         </div>
 
@@ -129,7 +144,7 @@
                                 </div>
                             </div>
                             <div class="chart-container">
-                                <canvas id="sectorCapacityChart"></canvas>
+                                <canvas id="sectorCapacityChart" role="img" aria-label="Sector Capacity Load doughnut chart"></canvas>
                             </div>
                         </div>
                     </div>
@@ -147,7 +162,7 @@
                             <!-- Left: List of active incidents -->
                             <div class="incident-feed-section">
                                 <div style="font-size: 0.75rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); margin-bottom:0.5rem; font-weight:700;">Live Alerts Feed</div>
-                                <div id="incident-list-container" class="incident-list">
+                                <div id="incident-list-container" class="incident-list" role="log" aria-live="polite">
                                     <!-- Populated dynamically -->
                                 </div>
                             </div>
@@ -238,7 +253,7 @@
 
                         <!-- Vector Soccer Pitch & Stand Rings -->
                         <div style="position: relative; width: 100%; height: 260px; max-width:320px; display:flex; align-items:center; justify-content:center;">
-                            <svg width="240" height="240" viewBox="0 0 200 200" style="filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.15));">
+                            <svg width="240" height="240" viewBox="0 0 200 200" style="filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.15));" role="img" aria-label="Stadium Telemetry Schematic Map">
                                 <!-- Outer Boundary Ring -->
                                 <circle cx="100" cy="100" r="92" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
                                 
@@ -353,7 +368,7 @@
                             <!-- Subscreen 1: AI Concierge Chatbot -->
                             <div id="screen-concierge" class="mobile-sub-screen active-sub">
                                 <div class="chat-window">
-                                    <div id="mobile-chat-messages" class="chat-message-area">
+                                    <div id="mobile-chat-messages" class="chat-message-area" role="log" aria-live="polite">
                                         <!-- Bubbles append here -->
                                     </div>
                                     <div id="mobile-suggested-queries" class="chat-suggested-queries">
@@ -363,8 +378,8 @@
                                         <button class="suggested-btn" data-query="Bag size limits">Backpack rules?</button>
                                     </div>
                                     <div class="chat-input-bar">
-                                        <input type="text" id="mobile-chat-input" class="chat-input-field" placeholder="Ask in Spanish, French, English, Arabic..." autocomplete="off">
-                                        <button id="mobile-chat-send" class="btn-chat-send">
+                                        <input type="text" id="mobile-chat-input" class="chat-input-field" placeholder="Ask in Spanish, French, English, Arabic..." autocomplete="off" aria-label="Ask concierge chat input">
+                                        <button id="mobile-chat-send" class="btn-chat-send" aria-label="Send message">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                                         </button>
                                     </div>
@@ -422,7 +437,7 @@
                                     </div>
                                 </div>
 
-                                <button id="btn-nav-calculate" class="btn-dispatch" style="padding: 0.5rem; font-size: 0.75rem; border-radius: 6px; margin-top:0.25rem;">
+                                <button id="btn-nav-calculate" class="btn-dispatch" style="padding: 0.5rem; font-size: 0.75rem; border-radius: 6px; margin-top:0.25rem;" aria-label="Calculate wayfinder route">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/></svg>
                                     Calculate Eco-Reroute
                                 </button>

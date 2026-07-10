@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initChatBot();
     initWayfinder();
     initIncidentHandler();
+    initApiSettings();
 
     // Start live updates loop
     setInterval(() => {
@@ -67,6 +68,9 @@ document.addEventListener('DOMContentLoaded', () => {
             playAlertSound(newIncident.severity === 'High' ? 'high' : 'info');
         }
     }, 18000);
+
+    // Render charts immediately on initial load
+    renderCharts();
 });
 
 // View mode switcher: Command Center (Desktop) vs Fan Companion (Mobile)
@@ -423,17 +427,9 @@ function updateIncidentFeedList(data) {
             </div>
         `;
     }).join('');
-
-    // Bind click events
-    listElement.querySelectorAll('.incident-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const id = item.dataset.id;
-            selectIncident(id);
-        });
-    });
 }
 
-function selectIncident(id) {
+async function selectIncident(id) {
     activeIncidentId = id;
     
     // Re-highlight list
@@ -447,8 +443,12 @@ function selectIncident(id) {
     if (!incident) return;
 
     // Get blueprint from GenAI Engine
-    const blueprint = aiEngine.analyzeIncident(incident);
-    renderIncidentBlueprint(blueprint, incident.status);
+    try {
+        const blueprint = await aiEngine.analyzeIncident(incident);
+        renderIncidentBlueprint(blueprint, incident.status);
+    } catch (err) {
+        console.error('Failed to get incident blueprint:', err);
+    }
 }
 
 function renderIncidentBlueprint(blueprint, status) {
@@ -520,6 +520,17 @@ function renderIncidentBlueprint(blueprint, status) {
 function initIncidentHandler() {
     const btnDispatch = document.getElementById('btn-bp-dispatch');
     const btnDismiss = document.getElementById('btn-bp-dismiss');
+    const listElement = document.getElementById('incident-list-container');
+
+    if (listElement) {
+        listElement.addEventListener('click', e => {
+            const item = e.target.closest('.incident-item');
+            if (item) {
+                const id = item.dataset.id;
+                selectIncident(id);
+            }
+        });
+    }
 
     btnDispatch.addEventListener('click', () => {
         if (!activeIncidentId) return;
@@ -561,19 +572,21 @@ function initChatBot() {
     appendBotMessage("Hello! Welcome to the FIFA World Cup 2026 Arena Companion. How can I help you find your gate, concessions, restrooms, transit routes, or review stadium security policies today?");
 
     // Message submit handlers
-    const submitMessage = () => {
+    const submitMessage = async () => {
         const text = chatInput.value.trim();
         if (!text) return;
 
         appendUserMessage(text);
         chatInput.value = "";
 
-        // Simulated AI response lag
-        setTimeout(() => {
-            const aiResponse = aiEngine.answerFanQuery(text);
+        try {
+            const aiResponse = await aiEngine.answerFanQuery(text);
             appendBotMessage(aiResponse.text, aiResponse.languageLabel, aiResponse.topic);
             playAlertSound('info');
-        }, 600);
+        } catch (error) {
+            console.error('Failed to answer fan query:', error);
+            appendBotMessage("An error occurred while calling the Gemini API. Please check your network connection or API Key.", "Error", "System Alert");
+        }
     };
 
     chatBtn.addEventListener('click', submitMessage);
@@ -593,12 +606,25 @@ function initChatBot() {
         });
     }
 
+    function escapeHTML(str) {
+        if (!str) return '';
+        return str.replace(/[&<>'"]/g, 
+            tag => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[tag] || tag)
+        );
+    }
+
     function appendUserMessage(text) {
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const bubble = document.createElement('div');
         bubble.className = 'chat-bubble user';
         bubble.innerHTML = `
-            <div>${text}</div>
+            <div>${escapeHTML(text)}</div>
             <div class="chat-bubble-time">${time}</div>
         `;
         chatArea.appendChild(bubble);
@@ -615,14 +641,14 @@ function initChatBot() {
             headerMarkup = `
                 <div class="chat-ai-indicator">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                    GenAI Concierge ${topic ? `• ${topic}` : ''} ${langTag ? `[${langTag}]` : ''}
+                    GenAI Concierge ${topic ? `• ${escapeHTML(topic)}` : ''} ${langTag ? `[${escapeHTML(langTag)}]` : ''}
                 </div>
             `;
         }
 
         bubble.innerHTML = `
             ${headerMarkup}
-            <div>${text}</div>
+            <div>${escapeHTML(text)}</div>
             <div class="chat-bubble-time">${time}</div>
         `;
         chatArea.appendChild(bubble);
@@ -766,4 +792,41 @@ function showGeneralNotification(title, message) {
         toast.style.animation = 'slideInToast 0.3s reverse';
         setTimeout(() => toast.remove(), 300);
     }, 4000);
+}
+
+// Gemini API Key Settings Panel Orchestration
+function initApiSettings() {
+    const toggleBtn = document.getElementById('btn-toggle-settings');
+    const dropdown = document.getElementById('api-settings-dropdown');
+    const keyInput = document.getElementById('gemini-api-key-input');
+    const saveBtn = document.getElementById('btn-save-api-key');
+    const successMsg = document.getElementById('api-key-success-msg');
+
+    if (!toggleBtn || !dropdown || !keyInput || !saveBtn) return;
+
+    // Load saved key from localStorage
+    const savedKey = localStorage.getItem('gemini_api_key') || '';
+    if (savedKey) {
+        keyInput.value = savedKey;
+        aiEngine.setApiKey(savedKey);
+    }
+
+    toggleBtn.addEventListener('click', () => {
+        const isHidden = dropdown.style.display === 'none';
+        dropdown.style.display = isHidden ? 'block' : 'none';
+    });
+
+    saveBtn.addEventListener('click', () => {
+        const key = keyInput.value.trim();
+        localStorage.setItem('gemini_api_key', key);
+        aiEngine.setApiKey(key);
+        
+        if (successMsg) {
+            successMsg.style.display = 'block';
+            setTimeout(() => {
+                successMsg.style.display = 'none';
+                dropdown.style.display = 'none';
+            }, 1500);
+        }
+    });
 }

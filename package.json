@@ -1,0 +1,12 @@
+{
+  "name": "arena360-ai",
+  "version": "1.0.0",
+  "description": "FIFA World Cup 2026 Smart Stadium Platform",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/**/*.test.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.2.1"
+  }
+}

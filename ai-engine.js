@@ -68,13 +68,98 @@ const TRANSLATIONS = {
 export class GenAIEngine {
     constructor() {
         this.recentAnalyses = [];
+        this.apiKey = '';
+    }
+
+    setApiKey(key) {
+        this.apiKey = key;
+    }
+
+    /**
+     * Analyzes a reported venue incident using Gemini API or simulated fallback.
+     */
+    async analyzeIncident(incident) {
+        const key = this.apiKey || (typeof window !== 'undefined' ? window.localStorage.getItem('gemini_api_key') : '') || (typeof process !== 'undefined' && process.env ? process.env.GEMINI_API_KEY : '');
+        if (key) {
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: `You are the GenAI Incident Resolver Co-Pilot for the FIFA World Cup 2026 Venue Command Center.
+Your task is to analyze a reported stadium incident and output a step-by-step resolution blueprint.
+
+Incident details:
+- ID: ${incident.id}
+- Title: ${incident.title}
+- Type: ${incident.type}
+- Description: ${incident.description}
+- Severity: ${incident.severity}
+- Location: ${incident.location}
+- Reported By: ${incident.reportedBy}
+
+Respond ONLY as a JSON object with this exact schema:
+{
+  "reasoningChain": [
+    "1. [IMPACT ASSESSMENT]: ...",
+    "2. [SAFETY CHECK]: ...",
+    "3. [CROWD FLOW CONTROL]: ..."
+  ],
+  "immediateActions": [
+    "Action 1...",
+    "Action 2...",
+    "Action 3..."
+  ],
+  "dispatchedUnits": [
+    "Unit name 1",
+    "Unit name 2"
+  ],
+  "broadcastTemplate": "Public address announcement script..."
+}`
+                            }]
+                        }]
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const text = data.candidates[0].content.parts[0].text.trim();
+                    const jsonText = text.replace(/^```json/, '').replace(/```$/, '').trim();
+                    const parsed = JSON.parse(jsonText);
+                    
+                    const blueprint = {
+                        id: incident.id,
+                        timestamp: new Date().toLocaleTimeString(),
+                        incidentType: incident.type,
+                        title: incident.title,
+                        severity: incident.severity,
+                        location: incident.location,
+                        reasoningChain: parsed.reasoningChain || [],
+                        immediateActions: parsed.immediateActions || [],
+                        broadcastTemplate: parsed.broadcastTemplate || '',
+                        dispatchedUnits: parsed.dispatchedUnits || []
+                    };
+
+                    this.recentAnalyses.unshift(blueprint);
+                    return blueprint;
+                }
+            } catch (err) {
+                console.warn('Gemini API incident analysis failed, using local fallback:', err);
+            }
+        }
+
+        return this.analyzeIncidentSync(incident);
     }
 
     /**
      * Simulates GenAI chain-of-thought analysis for a reported venue incident.
      * Generates a step-by-step resolution blueprint, communication plan, and resources.
      */
-    analyzeIncident(incident) {
+    analyzeIncidentSync(incident) {
         let blueprint = {
             id: incident.id,
             timestamp: new Date().toLocaleTimeString(),
@@ -169,10 +254,71 @@ export class GenAIEngine {
     }
 
     /**
+     * Resolves queries sent by fans or volunteers using real Gemini API or local keyword fallback.
+     */
+    async answerFanQuery(query) {
+        const key = this.apiKey || (typeof window !== 'undefined' ? window.localStorage.getItem('gemini_api_key') : '') || (typeof process !== 'undefined' && process.env ? process.env.GEMINI_API_KEY : '');
+        if (key) {
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: `You are the GenAI Concierge for the FIFA World Cup 2026 Smart Stadium Platform.
+Your task is to detect the language of the query and answer the user query accurately about the stadium.
+The stadium layout rules, gate wait times, concessions and transit info are as follows:
+- Gates: Gate A (North Transit, wait 12m), Gate B (VIP/Accessible, wait 5m), Gate C (East Parking, wait 32m), Gate D (West Metro Hub, wait 18m).
+- Food: Copa Tacos (Sec 104, 4.9 stars, wait 8m), United Grill (Sec 208, wait 22m), El Azteca Drinks (Sec 115, wait 14m), World Cup Merch (East Plaza, wait 28m), Eco-Bites (Sec 312, wait 4m).
+- Transit: Metro Line 1 (wait 4m), Shuttle Bus (wait 15m, delayed), Rideshare Zone Lot G (wait 25m), Micro-mobility (Active Way, wait 0m).
+- Restrooms: behind Sec 112 and Sec 204.
+- Sustainability: Zero-waste directive, Green composting bins.
+- Accessibility: Gate B optimized, all entrances wheelchair accessible.
+- Security rules: backpacks > A4 size not allowed, clear bags recommended. Lockers outside Gate A.
+
+Query: "${query}"
+
+Respond ONLY as a JSON object with this exact schema:
+{
+  "language": "en/es/fr/pt/ar",
+  "languageLabel": "Language Name detected",
+  "topic": "Category Name (e.g. Gates & Navigation, Food & Merch Concessions, Transit & Parking Routes, Restrooms & Hygiene, Sustainability & Waste Management, Accessibility Assist, Stadium Security Rules, General Inquiry)",
+  "text": "Your helpful, welcoming response in the detected language (matching the tone of the World Cup concierge)."
+}`
+                            }]
+                        }]
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const text = data.candidates[0].content.parts[0].text.trim();
+                    const jsonText = text.replace(/^```json/, '').replace(/```$/, '').trim();
+                    const parsed = JSON.parse(jsonText);
+                    return {
+                        language: parsed.language || 'en',
+                        languageLabel: parsed.languageLabel || 'English detected',
+                        topic: parsed.topic || 'General Inquiry',
+                        text: parsed.text || 'Welcome!',
+                        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    };
+                }
+            } catch (err) {
+                console.warn('Gemini API call failed, using local engine fallback:', err);
+            }
+        }
+
+        return this.answerFanQuerySync(query);
+    }
+
+    /**
      * Resolves queries sent by fans or volunteers using semantic keyword matching.
      * Detects language and returns contextual solutions in the target language.
      */
-    answerFanQuery(query) {
+    answerFanQuerySync(query) {
         const cleaned = query.toLowerCase().trim();
         
         // Simple language detection
