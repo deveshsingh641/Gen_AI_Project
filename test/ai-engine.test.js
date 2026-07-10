@@ -109,3 +109,39 @@ test('GenAIEngine Sustainability Report Tests', (t) => {
     assert.strictEqual(reportHighWaste.trashCapacityStatus, 'High Density');
     assert.ok(reportHighWaste.recommendations.some(r => r.title.includes('Waste Compactors')));
 });
+
+test('GenAIEngine Live Gemini API Mock Test', async (t) => {
+    const engine = new GenAIEngine();
+    engine.setApiKey('mock-api-key');
+
+    const originalFetch = globalThis.fetch;
+    // Mock fetch
+    globalThis.fetch = async (url, options) => {
+        assert.ok(url.includes('mock-api-key'));
+        return {
+            ok: true,
+            json: async () => ({
+                candidates: [{
+                    content: {
+                        parts: [{
+                            text: JSON.stringify({
+                                language: 'en',
+                                languageLabel: 'English detected',
+                                topic: 'Gates & Navigation',
+                                text: 'Mocked response from Gemini API.'
+                            })
+                        }]
+                    }
+                }]
+            })
+        };
+    };
+
+    try {
+        const result = await engine.answerFanQuery('How to enter?');
+        assert.strictEqual(result.language, 'en');
+        assert.strictEqual(result.text, 'Mocked response from Gemini API.');
+    } finally {
+        globalThis.fetch = originalFetch; // restore original
+    }
+});
