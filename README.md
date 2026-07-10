@@ -16,6 +16,18 @@ The platform provides:
 
 ---
 
+## 🎯 Chosen Vertical
+* **Smart Infrastructure & Venue Operations (FIFA World Cup 2026)**
+Arena360 AI is designed specifically for sports organizers and attendees, addressing high-density crowd flow, emergency responder dispatching, carbon footprint wayfinding, and multilingual fan assistance.
+
+## 🧠 Approach and Logic
+Our implementation leverages a **hybrid client-side AI architecture** to deliver live, intelligent responses with high reliability:
+1. **Hybrid AI Resolver:** Calls the **Google Gemini 1.5 Flash API** directly to process complex inquiries and incident logs. If no API key is supplied, it falls back to a **localized keywords engine** to guarantee constant operation.
+2. **Structured JSON Output:** Prompt payloads instruct Gemini to output structured JSON matching the application's schema (language labels, topics, and responses), simplifying client-side state integration.
+3. **Zero-Overhead Framework:** Developed using native web components (ES Modules, modern Vanilla CSS, Chart.js) to minimize bundle sizes and maximize performance on mobile connections.
+
+---
+
 ## 🚀 Key Features
 
 ### 1. 🖥️ Venue Command Center (Operator Console)
@@ -81,6 +93,13 @@ If you have Python installed, run:
 python -m http.server 8000
 ```
 Then open `http://localhost:8000` in your web browser.
+
+---
+
+## 📋 Assumptions Made
+1. **IoT Telemetry Sensor Feeds:** Assumed stadium entrances, sector gates, and transport stations publish real-time queue states and occupancy levels via standard telemetry APIs.
+2. **Offline Resilience:** Assumed network drops inside a crowded stadium are common; therefore, the local keywords-engine is designed to handle common fan queries (like gates, food, rules) with zero network latency.
+3. **Local Storage Privacy:** Assumed API key settings are strictly managed by the user on their device, storing keys inside `localStorage` rather than exposing them to external proxy backends.
 
 ---
 
